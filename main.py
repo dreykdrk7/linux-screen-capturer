@@ -7,18 +7,32 @@ from PIL import ImageGrab
 
 bot = telebot.TeleBot(TOKEN)
 
+def clear_image_folder(folder_path):
+    if not os.path.exists(IMAGE_FOLDER):
+        return
+
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        try:
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+        except Exception as e:
+            print(f'Error al eliminar {file_path}. Razón: {e}')
+
 
 def take_screenshot(initial_id, current_count):
     if not os.path.exists(IMAGE_FOLDER):
         os.makedirs(IMAGE_FOLDER)
     
-    screenshot_filename = os.path.join(IMAGE_FOLDER, f"{initial_id + current_count}.png")
+    screenshot_filename = os.path.join(IMAGE_FOLDER, f"{initial_id}_{current_count}.png")
     screenshot = ImageGrab.grab()
     screenshot.save(screenshot_filename)
     return screenshot_filename
 
 
 if __name__ == '__main__':
+
+    clear_image_folder(IMAGE_FOLDER)
 
     new_session_msg = input('Introduce un texto para identificar la nueva sesión de capturas:\n')
     sleep_between_captures = float(input('Establece un tiempo de retardo entre las capturas (en minutos):\n')) * 60 
@@ -44,18 +58,19 @@ if __name__ == '__main__':
         
         # Eliminar mensajes antiguos si hemos alcanzado 20 imágenes
         if len(messages_to_delete) > 20:
-            # Eliminar el mensaje de Telegram
+            # ID del mensaje a eliminar (el más antiguo)
             oldest_message_id = messages_to_delete.pop(0)
             bot.delete_message(GROUP_ID, oldest_message_id)
-            
-            # Calcular el nombre del archivo de la imagen más antigua basándonos en current_count
-            oldest_image_number = current_count - len(messages_to_delete) - 20
-            image_path_to_delete = f"{IMAGE_FOLDER}/{initial_msg_id + oldest_image_number}.png"
-            
+            print("Mensaje de Telegram eliminado:", oldest_message_id)
+
+            oldest_image_index = current_count - 20
+            image_path_to_delete = f"{IMAGE_FOLDER}/{initial_msg_id}_{oldest_image_index}.png"
+    
             # Eliminar el archivo de imagen local
             if os.path.exists(image_path_to_delete):
                 os.remove(image_path_to_delete)
                 print(f"Imagen borrada localmente: {image_path_to_delete}")
+            sleep(1)
 
         current_count += 1
         sleep(sleep_between_captures)
