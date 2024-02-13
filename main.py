@@ -1,22 +1,17 @@
-import telebot
-from time import sleep
-from datetime import datetime
-import os
 from config import TOKEN, GROUP_ID, IMAGE_FOLDER
-from PIL import ImageGrab
+import telebot
 import os
+from time import sleep
+from PIL import ImageGrab
 
-""" def take_screenshot(initial_id, current_count, image_path):
-    # Construye el nombre de archivo completo con la ruta, ID inicial y contador actual
-    screenshot_filename = os.path.join(image_path, f"{initial_id + current_count}.png")
-    screenshot = ImageGrab.grab()
-    screenshot.save(screenshot_filename)
-    return screenshot_filename
- """
 
 bot = telebot.TeleBot(TOKEN)
 
+
 def take_screenshot(initial_id, current_count):
+    if not os.path.exists(IMAGE_FOLDER):
+        os.makedirs(IMAGE_FOLDER)
+    
     screenshot_filename = os.path.join(IMAGE_FOLDER, f"{initial_id + current_count}.png")
     screenshot = ImageGrab.grab()
     screenshot.save(screenshot_filename)
