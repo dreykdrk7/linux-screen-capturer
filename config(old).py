@@ -1,0 +1,4 @@
+
+TOKEN = 'YOUR_BOT_TOKEN'
+GROUP_ID = 'YOUR_GROUP_ID'
+IMAGE_FOLDER = './captures/'
